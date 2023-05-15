@@ -6,23 +6,15 @@
 /*   By: hdiot <hdiot@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/02 18:14:06 by hdiot             #+#    #+#             */
-/*   Updated: 2023/05/10 15:41:56 by hdiot            ###   ########.fr       */
+/*   Updated: 2023/05/15 15:02:19 by hdiot            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-int nbrargs(void)
-{
-	printf("Must have those arguments :\n");
-	printf("number_of_philosophers time_to_die time_to_eat time_to_sleep\n");
-	printf("[number_of_times_each_philosopher_must_eat]\n");
-	return (1);
-}
-
 void	getinfo(t_ph *ph, char **av)
 {
-	int i;
+	int	i;
 
 	checkdigits(av);
 	i = ft_atoi(av[1]);
@@ -38,36 +30,71 @@ void	getinfo(t_ph *ph, char **av)
 	checkvalue(ph);
 }
 
-void	*test(void *info)
+void	*get_time(void *info)
 {
-	t_philo *ph;
+	t_philo	*ph;
 
 	ph = (t_philo *)info;
-	newtime(ph);
-	
+	ph->curloop = 0;
+	if (ph->id % 2 == 0)
+		ph->timer += ft_usleep(ph->infph.teat);
+	while (ph->curloop < ph->infph.loop)
+	{
+		eating(ph);
+		sleepthink(ph);
+		ph->curloop++;
+	}
 	return (info);
+}
+
+void	init_mutex(t_ph *ph)
+{
+	pthread_mutex_init(&ph->ph->speak, NULL);
+	pthread_mutex_init(&ph->ph->l_fork, NULL);
+	ph->ph->r_fork = malloc(sizeof(pthread_mutex_t));
+	if (!ph->ph->r_fork)
+		exit(EXIT_FAILURE);
+	pthread_mutex_init(ph->ph->r_fork, NULL);
 }
 
 void	philo(char **av)
 {
-	t_ph ph;
-	int i;
+	t_ph		ph;
+	int			i;
+	pthread_t	*threads;
+	t_philo		*test;
 
 	i = 0;
 	getinfo(&ph, av);
+	ph.ph->timer = 0;
+	threads = malloc(sizeof(pthread_t) * ph.ph->infph.nbr_philo);
+	test = malloc(sizeof(t_philo) * ph.ph->infph.nbr_philo);
+	init_mutex(&ph);
 	while (i < ph.ph->infph.nbr_philo)
 	{
-		pthread_create(&ph.ph[i].thread_id, NULL, test, &ph.ph[i]);
-		pthread_join(ph.ph[i].thread_id, NULL);
+		ph.ph[i].id = i + 1;
+		test[i] = ph.ph[i];
+		pthread_create(&threads[i], NULL, get_time, &test[i]);
 		i++;
 	}
-		free(ph.ph);
+	i = 0;
+	while (i < ph.ph->infph.nbr_philo)
+	{	
+		pthread_join(threads[i], NULL);
+		i++;
+	}
+	pthread_mutex_destroy(&ph.ph->speak);
+	pthread_mutex_destroy(&ph.ph->l_fork);
+	pthread_mutex_destroy(ph.ph->r_fork);
+	free(ph.ph);
+	free(threads);
+	free(test);
 }
 
-int main(int argc, char **argv)
+int	main(int argc, char **argv)
 {
 	if (argc < 5 || argc > 6)
-		return(nbrargs());
+		return (nbrargs());
 	philo(argv);
 	return (0);
 }

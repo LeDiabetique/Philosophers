@@ -6,7 +6,7 @@
 /*   By: hdiot <hdiot@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/04 09:20:32 by hdiot             #+#    #+#             */
-/*   Updated: 2023/05/04 09:24:28 by hdiot            ###   ########.fr       */
+/*   Updated: 2023/05/15 14:39:50 by hdiot            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,4 +70,12 @@ int	ft_atoi(const char	*str)
 		s++;
 	}
 	return (res * sign);
+}
+
+int	nbrargs(void)
+{
+	printf("Must have those arguments :\n");
+	printf("number_of_philosophers time_to_die time_to_eat time_to_sleep\n");
+	printf("[number_of_times_each_philosopher_must_eat]\n");
+	return (1);
 }

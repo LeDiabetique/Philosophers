@@ -6,7 +6,7 @@
 /*   By: hdiot <hdiot@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/03 10:02:14 by hdiot             #+#    #+#             */
-/*   Updated: 2023/05/10 10:15:07 by hdiot            ###   ########.fr       */
+/*   Updated: 2023/05/16 14:06:59 by hdiot            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,22 +51,24 @@ void	checkmaxint(char *str)
 void	checkvalue(t_ph *ph)
 {
 	if (ph->ph->infph.nbr_philo <= 0 || ph->ph->infph.tdie <= 0
-			|| ph->ph->infph.teat <= 0 || ph->ph->infph.tsleep <= 0)
+		|| ph->ph->infph.teat <= 0 || ph->ph->infph.tsleep <= 0)
 	{
-		printf("Bad args, only positives digits near 1 and MAXINT are allowed\n");
-		exit(EXIT_FAILURE);	
+		printf("Bad args, only positives digits \
+			near 1 and MAXINT are allowed\n");
+		exit(EXIT_FAILURE);
 	}
 	if (ph->ph->infph.loop < -1 || ph->ph->infph.loop == 0)
 	{
-		printf("Bad args, only positives digits near 1 and MAXINT are allowed\n");
-		exit(EXIT_FAILURE);	
+		printf("Bad args, only positives digits \
+			near 1 and MAXINT are allowed\n");
+		exit(EXIT_FAILURE);
 	}
 }
 
 void	checkdigits(char **av)
 {
-	int i;
-	int j;
+	int	i;
+	int	j;
 
 	i = 1;
 	while (av[i])
@@ -77,11 +79,11 @@ void	checkdigits(char **av)
 			if (ft_isdigit((int)av[i][j]) == 0)
 			{
 				printf("Bad args, only digits are allowed\n");
-				exit(EXIT_FAILURE);			
+				exit(EXIT_FAILURE);
 			}
 			j++;
 		}
 		checkmaxint(av[i]);
-		i++;	
+		i++;
 	}
 }

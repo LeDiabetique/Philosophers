@@ -6,7 +6,7 @@
 /*   By: hdiot <hdiot@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/10 10:24:24 by hdiot             #+#    #+#             */
-/*   Updated: 2023/05/17 12:05:56 by hdiot            ###   ########.fr       */
+/*   Updated: 2023/05/18 10:19:38 by hdiot            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,8 +47,8 @@ void	eating(t_philo *ph)
 		ph->timer = ft_usleep(ph->infph.tdie);
 	pthread_mutex_unlock(&ph->speak);
 	ph->timer += ft_usleep(ph->infph.teat);
-	pthread_mutex_unlock(&ph->fork[ph->r_fork]);
 	pthread_mutex_unlock(&ph->fork[ph->l_fork]);
+	pthread_mutex_unlock(&ph->fork[ph->r_fork]);
 }
 
 void	sleepthink(t_philo *ph)

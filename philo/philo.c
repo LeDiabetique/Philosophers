@@ -6,7 +6,7 @@
 /*   By: hdiot <hdiot@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/02 18:14:06 by hdiot             #+#    #+#             */
-/*   Updated: 2023/05/17 12:32:44 by hdiot            ###   ########.fr       */
+/*   Updated: 2023/05/18 11:36:19 by hdiot            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,6 +50,7 @@ void	*get_time(void *info)
 	{
 		ph->curloop++;
 		eating(ph);
+		printf("[%d] currentloop %d\n", ph->id, ph->curloop);
 		if (ph->curloop == ph->infph.loop)
 			break ;
 		sleepthink(ph);
@@ -64,7 +65,6 @@ void	init_mutex(t_ph *ph)
 
 	i = 0;
 	b = ph->ph->infph.nbr_philo;
-	printf("B IS %d\n", b);
 	if (pthread_mutex_init(&ph->ph->speak, NULL) != 0)
 		printf("Failed to init speak mutex\n");
 	ph->ph->fork = malloc(sizeof(pthread_mutex_t) * b);
@@ -83,15 +83,11 @@ void	init_mutex(t_ph *ph)
 
 void	destroy_philo(t_ph *ph, pthread_t *threads)
 {
-//	int	i;
-//	int	b;
-
-	//i = 0;
-	//b = ph->ph[0].infph.nbr_philo;
 	if (pthread_mutex_destroy(&ph->ph->speak) < 0)
 		printf("Failed to destroy\n");
 	pthread_mutex_destroy(ph->ph->fork);
 	free(threads);
+	free(ph->ph->fork);
 	free(ph->ph);
 }
 
@@ -99,6 +95,7 @@ void	philo(char **av)
 {
 	t_ph		ph;
 	int			i;
+	int			res;
 	pthread_t	*threads;
 
 	i = 0;
@@ -109,15 +106,14 @@ void	philo(char **av)
 	init_mutex(&ph);
 	while (i < ph.ph->infph.nbr_philo)
 	{
-		printf("lfork ADRESS %p rfork ADRESS %p\n", &ph.ph->fork[i], &ph.ph->fork[i + 1]);
-		pthread_create(&threads[i], NULL, get_time, &ph.ph[i]);
-		i++;
+		res = pthread_create(&threads[i], NULL, get_time, &ph.ph[i]);
 		ft_usleep(50);
-	}
-	i = 0;
-	while (i < ph.ph->infph.nbr_philo)
-	{	
 		pthread_detach(threads[i]);
+		i++;
+	}
+	printf("RES = %d\n", res);
+	while (1)
+	{
 		i++;
 	}
 	destroy_philo(&ph, threads);

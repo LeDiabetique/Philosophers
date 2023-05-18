@@ -6,7 +6,7 @@
 /*   By: hdiot <hdiot@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/02 18:14:06 by hdiot             #+#    #+#             */
-/*   Updated: 2023/05/16 16:44:21 by hdiot            ###   ########.fr       */
+/*   Updated: 2023/05/17 12:32:44 by hdiot            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,8 +46,6 @@ void	*get_time(void *info)
 	ph->curloop = 0;
 	if (ph->id % 2 == 0)
 		ph->timer += ft_usleep(10);
-	printf("LFORK %d RFORK %d\n", ph->l_fork, ph->r_fork);
-	printf("lfork ADRESS %p rfork ADRESS %p\n", &ph->fork[ph->l_fork], &ph->fork[ph->r_fork]);
 	while (ph->curloop < ph->infph.loop)
 	{
 		ph->curloop++;
@@ -77,18 +75,19 @@ void	init_mutex(t_ph *ph)
 	while (i < b)
 	{
 		ph->ph[i].l_fork = i;
-		ph->ph[i].r_fork = i + 1;
+		ph->ph[i].r_fork = (i + 1) % b;
+		ph->ph[i].fork = ph->ph->fork;
 		i++;
 	}
 }
 
 void	destroy_philo(t_ph *ph, pthread_t *threads)
 {
-	int	i;
-	int	b;
+//	int	i;
+//	int	b;
 
-	i = 0;
-	b = ph->ph[0].infph.nbr_philo;
+	//i = 0;
+	//b = ph->ph[0].infph.nbr_philo;
 	if (pthread_mutex_destroy(&ph->ph->speak) < 0)
 		printf("Failed to destroy\n");
 	pthread_mutex_destroy(ph->ph->fork);

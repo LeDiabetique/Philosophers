@@ -6,7 +6,7 @@
 /*   By: hdiot <hdiot@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/02 18:15:41 by hdiot             #+#    #+#             */
-/*   Updated: 2023/05/18 10:19:42 by hdiot            ###   ########.fr       */
+/*   Updated: 2023/05/19 15:07:06 by hdiot            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,8 +34,10 @@ typedef struct s_philo
 {
 	int				l_fork;
 	int				r_fork;
-	pthread_mutex_t	speak;
+	int				maxeat;
+	int				speak;
 	pthread_mutex_t	*fork;
+	int				meat;
 	t_info			infph;
 	long int		timer;
 	long int		start_time;
@@ -53,6 +55,7 @@ void		checkmaxint(char *str);
 void		checkvalue(t_ph *ph);
 void		checkdigits(char **av);
 int			nbrargs(void);
+void		getinfo(t_ph *ph, char **av);
 
 void		ft_putstr_fd(char *str, int fd);
 int			ft_atoi(const char	*str);
@@ -63,5 +66,8 @@ long int	timestamp(void);
 void		eating(t_philo *ph);
 void		sleepthink(t_philo *ph);
 long int	ft_usleep(int tlimit);
+void		*get_time(void *info);
+void		init_mutex(t_ph *ph);
+void		destroy_philo(t_ph *ph, pthread_t *threads);
 
 #endif

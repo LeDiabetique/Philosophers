@@ -6,7 +6,7 @@
 /*   By: hdiot <hdiot@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/02 18:14:06 by hdiot             #+#    #+#             */
-/*   Updated: 2023/05/21 18:52:44 by hdiot            ###   ########.fr       */
+/*   Updated: 2023/05/21 21:57:57 by hdiot            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,13 +76,13 @@ void	philo(char **av)
 		pthread_create(&threads[i], NULL, get_time, &ph.ph[i]);
 		i++;
 	}
-	while (!is_over(&ph))
-		;
 	i = 0;
 	while (i < ph.ph->infph.nbr_philo)
 		pthread_detach(threads[i++]);
-	destroy_philo(&ph, threads);
+	while (!is_over(&ph))
+		;
 	printf("FINITO\n");
+	destroy_philo(&ph, threads);
 }
 
 int	main(int argc, char **argv)

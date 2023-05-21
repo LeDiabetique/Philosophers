@@ -6,7 +6,7 @@
 /*   By: hdiot <hdiot@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/02 18:14:06 by hdiot             #+#    #+#             */
-/*   Updated: 2023/05/19 15:31:50 by hdiot            ###   ########.fr       */
+/*   Updated: 2023/05/21 18:52:44 by hdiot            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,8 +14,8 @@
 
 int	is_over(t_ph *ph)
 {
-	int i;
 	int eat;
+	int	i;
 	int max;
 
 	i = 0;
@@ -25,6 +25,8 @@ int	is_over(t_ph *ph)
 	{
 		if (i == ph->ph->infph.nbr_philo)
 			i = 0;
+		if (is_dead(ph, i) == 1)
+			break ;
 		pthread_mutex_lock(&ph->ph[i].fork[ph->ph->meat]);
 		if (ph->ph[i].maxeat == 1)
 		{
@@ -33,10 +35,28 @@ int	is_over(t_ph *ph)
 		}
 		pthread_mutex_unlock(&ph->ph[i].fork[ph->ph->meat]);
 		if (max == eat)
-			return (1);
+		{
+			pthread_mutex_lock(&ph->ph[i].fork[ph->ph->speak]);
+			break ;
+		}	
 		i++;
 	}
 	return (1);
+}
+
+int	is_dead(t_ph *ph, int i)
+{
+	long int	time;
+	int			tdie;
+
+	tdie = ph->ph[i].infph.tdie;
+	time = timestamp();
+	if (time - ph->ph[i].lasteat >= tdie)
+	{
+		printf("%ld [%d] \033[91mdied\033[0m\n", time - ph->ph[i].stimer, ph->ph[i].id);
+		return (1);
+	}
+	return (0);
 }
 
 void	philo(char **av)
@@ -53,17 +73,14 @@ void	philo(char **av)
 	init_mutex(&ph);
 	while (i < ph.ph->infph.nbr_philo)
 	{
-	   // printf("[%d] LFORK %p RFORK %p\n", ph.ph[i].id, &ph.ph[i].fork[ph.ph[i].l_fork], &ph.ph[i].fork[ph.ph[i].r_fork]);
-		//printf("[%d] speak %p meat %p\n", ph.ph[i].id, &ph.ph[i].fork[ph.ph[i].speak], &ph.ph[i].fork[ph.ph[i].meat]);
 		pthread_create(&threads[i], NULL, get_time, &ph.ph[i]);
-		usleep(50);
 		i++;
 	}
+	while (!is_over(&ph))
+		;
 	i = 0;
 	while (i < ph.ph->infph.nbr_philo)
 		pthread_detach(threads[i++]);
-	while (!is_over(&ph))
-		;
 	destroy_philo(&ph, threads);
 	printf("FINITO\n");
 }

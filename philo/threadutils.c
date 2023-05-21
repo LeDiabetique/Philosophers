@@ -6,7 +6,7 @@
 /*   By: hdiot <hdiot@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/10 10:24:24 by hdiot             #+#    #+#             */
-/*   Updated: 2023/05/19 16:49:15 by hdiot            ###   ########.fr       */
+/*   Updated: 2023/05/21 18:51:04 by hdiot            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,28 +38,40 @@ long int	ft_usleep(int tlimit)
 		usleep(100);
 		time = timestamp();
 	}
-	//printf("%ld - %ld = %ld\n", time, res, time - res);
 	return (time - res);
+}
+
+long int	timestampdiff(long int start)
+{
+	long int newtime;
+	long int acttime;
+
+	acttime = 0;
+	acttime = timestamp();
+	 
+	newtime = acttime - start;
+	return (newtime);
 }
 
 void	eating(t_philo *ph)
 {
 	pthread_mutex_lock(&ph->fork[ph->l_fork]);
 	pthread_mutex_lock(&ph->fork[ph->speak]);
-	ph->timer = timestamp() - ph->timer;
-	printf("%ld [%d] \033[92mhas taken a lfork \033[0m\n", ph->timer, ph->id);
+	ph->timer = timestampdiff(ph->stimer);
+	printf("%ld [%d] \033[92mhas taken a lfork\033[0m\n", ph->timer, ph->id);
 	pthread_mutex_unlock(&ph->fork[ph->speak]);
 	pthread_mutex_lock(&ph->fork[ph->r_fork]);
 	pthread_mutex_lock(&ph->fork[ph->speak]);
-	ph->timer = timestamp() - ph->timer;
-	printf("%ld [%d] \033[92mhas taken a rfork \033[0m\n", ph->timer, ph->id);
-	ph->timer = timestamp() - ph->timer;
+	ph->timer = timestampdiff(ph->stimer);
+	printf("%ld [%d] \033[92mhas taken a rfork\033[0m\n", ph->timer, ph->id);
+	ph->timer = timestampdiff(ph->stimer);
 	printf("%ld [%d] \033[93mis eating\033[0m\n", ph->timer, ph->id);
+	ph->lasteat = timestamp();
 	pthread_mutex_unlock(&ph->fork[ph->speak]);
 	if (ph->infph.nbr_philo == 1)
-		ft_usleep(ph->infph.tdie);
+		ph->timer += ft_usleep(ph->infph.tdie);
 	ft_usleep(ph->infph.teat);
-	ph->timer = timestamp() - ph->timer;
+	ph->timer = timestampdiff(ph->stimer);
 	pthread_mutex_unlock(&ph->fork[ph->l_fork]);
 	pthread_mutex_unlock(&ph->fork[ph->r_fork]);
 }
@@ -67,13 +79,13 @@ void	eating(t_philo *ph)
 void	sleepthink(t_philo *ph)
 {
 	pthread_mutex_lock(&ph->fork[ph->speak]);
-	ph->timer = timestamp() - ph->timer;
+	ph->timer = timestampdiff(ph->stimer);
 	printf("%ld [%d] \033[94mis sleeping\033[0m\n", ph->timer, ph->id);
 	pthread_mutex_unlock(&ph->fork[ph->speak]);
 	ft_usleep(ph->infph.tsleep);
-	ph->timer = timestamp() - ph->timer;
+	ph->timer = timestampdiff(ph->stimer);
 	pthread_mutex_lock(&ph->fork[ph->speak]);
-	ph->timer = timestamp() - ph->timer;
+	ph->timer = timestampdiff(ph->stimer);
 	printf("%ld [%d] \033[95mis thinking\033[0m\n", ph->timer, ph->id);
 	pthread_mutex_unlock(&ph->fork[ph->speak]);
 }

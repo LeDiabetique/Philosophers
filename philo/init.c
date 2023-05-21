@@ -6,7 +6,7 @@
 /*   By: hdiot <hdiot@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/19 13:24:52 by hdiot             #+#    #+#             */
-/*   Updated: 2023/05/19 16:37:16 by hdiot            ###   ########.fr       */
+/*   Updated: 2023/05/21 17:08:53 by hdiot            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,8 @@ void	getinfo(t_ph *ph, char **av)
 		ph->ph[b].id = b + 1;
 		ph->ph[b].timer = 0;
 		ph->ph[b].maxeat = 0;
+		ph->ph[b].stimer = timestamp();
+		ph->ph[b].lasteat = ph->ph[b].stimer;
 		ph->ph[b].infph.tdie = ft_atoi(av[2]);
 		ph->ph[b].infph.teat = ft_atoi(av[3]);
 		ph->ph[b].infph.tsleep = ft_atoi(av[4]);
@@ -45,10 +47,9 @@ void	*get_time(void *info)
 
 	ph = (t_philo *)info;
 	ph->curloop = 0;
-	ph->timer = timestamp();
 	if (ph->id % 2 == 0)
-		ft_usleep(120);
-	ph->timer = timestamp() - ph->timer;
+		ft_usleep(ph->infph.teat / 2);
+	ph->timer = timestampdiff(ph->stimer);
 	while (ph->curloop < ph->infph.loop)
 	{
 		ph->curloop++;

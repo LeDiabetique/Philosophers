@@ -6,7 +6,7 @@
 /*   By: hdiot <hdiot@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/02 18:15:41 by hdiot             #+#    #+#             */
-/*   Updated: 2023/05/19 15:07:06 by hdiot            ###   ########.fr       */
+/*   Updated: 2023/05/21 18:44:22 by hdiot            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,11 +36,12 @@ typedef struct s_philo
 	int				r_fork;
 	int				maxeat;
 	int				speak;
+	long int		stimer;
 	pthread_mutex_t	*fork;
 	int				meat;
 	t_info			infph;
 	long int		timer;
-	long int		start_time;
+	long int		lasteat;
 	int				curloop;
 	int				id;
 }	t_philo;
@@ -69,5 +70,7 @@ long int	ft_usleep(int tlimit);
 void		*get_time(void *info);
 void		init_mutex(t_ph *ph);
 void		destroy_philo(t_ph *ph, pthread_t *threads);
+long int	timestampdiff(long int start);
+int			is_dead(t_ph *ph, int i);
 
 #endif

@@ -13,7 +13,7 @@
 NAME        := philo
 
 CC        := gcc
-FLAGS    := -Wall -Wextra -Werror -g3 -pthread
+FLAGS    := -Wall -Wextra -Werror -g3 -lpthread
 
 SRCS        :=  main.c check.c utils.c threadutils.c init.c \
 

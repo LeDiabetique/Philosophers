@@ -6,7 +6,7 @@
 /*   By: hdiot <hdiot@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/02 18:14:06 by hdiot             #+#    #+#             */
-/*   Updated: 2023/05/21 21:57:57 by hdiot            ###   ########.fr       */
+/*   Updated: 2023/05/22 15:59:20 by hdiot            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,9 +14,9 @@
 
 int	is_over(t_ph *ph)
 {
-	int eat;
+	int	eat;
 	int	i;
-	int max;
+	int	max;
 
 	i = 0;
 	eat = ph->ph->infph.nbr_philo;
@@ -25,19 +25,22 @@ int	is_over(t_ph *ph)
 	{
 		if (i == ph->ph->infph.nbr_philo)
 			i = 0;
-		if (is_dead(ph, i) == 1)
-			break ;
 		pthread_mutex_lock(&ph->ph[i].fork[ph->ph->meat]);
 		if (ph->ph[i].maxeat == 1)
 		{
 			ph->ph[i].maxeat = 2;
+			ph->ph[i].rule = 1;
 			max++;
 		}
 		pthread_mutex_unlock(&ph->ph[i].fork[ph->ph->meat]);
 		if (max == eat)
+			return (pthread_mutex_lock(&ph->ph[i].fork[ph->ph->speak]), 1);	
+		if (is_dead(ph, i) == 1)
 		{
-			pthread_mutex_lock(&ph->ph[i].fork[ph->ph->speak]);
-			break ;
+			i = 0;
+			while (i < ph->ph->infph.nbr_philo)
+				pthread_mutex_destroy(&ph->ph[i++].fork[ph->ph->speak]);
+			return (1);
 		}	
 		i++;
 	}
@@ -51,12 +54,31 @@ int	is_dead(t_ph *ph, int i)
 
 	tdie = ph->ph[i].infph.tdie;
 	time = timestamp();
+	pthread_mutex_lock(&ph->ph[i].fork[ph->ph->dead]);
 	if (time - ph->ph[i].lasteat >= tdie)
 	{
-		printf("%ld [%d] \033[91mdied\033[0m\n", time - ph->ph[i].stimer, ph->ph[i].id);
-		return (1);
+		if (ph->ph[i].rule == 1)
+			return (1);
+		pthread_mutex_lock(&ph->ph[i].fork[ph->ph->speak]);
+		printf("%ld [%d] \033[91mdied\033[0m\n", \
+			time - ph->ph[i].stimer, ph->ph[i].id);
+		setruleone(ph);
+		return (pthread_mutex_unlock(&ph->ph[i].fork[ph->ph->dead]), 1);
 	}
+	pthread_mutex_unlock(&ph->ph[i].fork[ph->ph->dead]);
 	return (0);
+}
+
+void	setruleone(t_ph *ph)
+{
+	int i;
+
+	i = 0;
+	while (i < ph->ph->infph.nbr_philo)
+	{
+		ph->ph[i].rule = 1;
+		i++;
+	}
 }
 
 void	philo(char **av)
@@ -79,10 +101,10 @@ void	philo(char **av)
 	i = 0;
 	while (i < ph.ph->infph.nbr_philo)
 		pthread_detach(threads[i++]);
-	while (!is_over(&ph))
+	while (is_over(&ph) == 0)
 		;
-	printf("FINITO\n");
 	destroy_philo(&ph, threads);
+	printf("FINITO\n");
 }
 
 int	main(int argc, char **argv)

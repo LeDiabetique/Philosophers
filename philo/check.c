@@ -6,7 +6,7 @@
 /*   By: hdiot <hdiot@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/03 10:02:14 by hdiot             #+#    #+#             */
-/*   Updated: 2023/05/16 14:06:59 by hdiot            ###   ########.fr       */
+/*   Updated: 2023/05/22 10:09:23 by hdiot            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,7 +46,6 @@ void	checkmaxint(char *str)
 			badargsexit();
 	}
 }
-
 
 void	checkvalue(t_ph *ph)
 {

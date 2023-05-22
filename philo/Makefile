@@ -6,14 +6,14 @@
 #    By: hdiot <hdiot@student.42.fr>                +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/05/02 19:11:03 by hdiot             #+#    #+#              #
-#    Updated: 2023/05/21 22:02:34 by hdiot            ###   ########.fr        #
+#    Updated: 2023/05/22 16:02:33 by hdiot            ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME        := philo
 
 CC        := gcc
-FLAGS    := -Wall -Wextra -Werror -fsanitize=thread -g3 -lpthread
+FLAGS    := -Wall -Wextra -Werror -fsanitize=thread -g3 -pthread
 
 SRCS        :=  main.c check.c utils.c threadutils.c init.c \
 

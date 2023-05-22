@@ -6,7 +6,7 @@
 /*   By: hdiot <hdiot@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/10 10:24:24 by hdiot             #+#    #+#             */
-/*   Updated: 2023/05/22 15:04:40 by hdiot            ###   ########.fr       */
+/*   Updated: 2023/05/22 16:55:52 by hdiot            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,14 +55,12 @@ long int	timestampdiff(long int start)
 int	eating(t_philo *ph)
 {
 	pthread_mutex_lock(&ph->fork[ph->l_fork]);
-	if (ph->rule == 1)
-		return (pthread_mutex_unlock(&ph->fork[ph->l_fork]), 1);
 	pthread_mutex_lock(&ph->fork[ph->speak]);
 	ph->timer = timestampdiff(ph->stimer);
 	printf("%ld [%d] \033[92mhas taken a lfork\033[0m\n", ph->timer, ph->id);
 	pthread_mutex_unlock(&ph->fork[ph->speak]);
 	pthread_mutex_lock(&ph->fork[ph->r_fork]);
-	if (ph->rule == 1)
+	if (checkrule(ph) == 1)
 		return (pthread_mutex_unlock(&ph->fork[ph->l_fork]), \
 			pthread_mutex_unlock(&ph->fork[ph->r_fork]), 1);
 	pthread_mutex_lock(&ph->fork[ph->speak]);

@@ -6,7 +6,7 @@
 /*   By: hdiot <hdiot@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/02 18:14:06 by hdiot             #+#    #+#             */
-/*   Updated: 2023/05/22 15:59:20 by hdiot            ###   ########.fr       */
+/*   Updated: 2023/05/22 16:42:55 by hdiot            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,8 +57,10 @@ int	is_dead(t_ph *ph, int i)
 	pthread_mutex_lock(&ph->ph[i].fork[ph->ph->dead]);
 	if (time - ph->ph[i].lasteat >= tdie)
 	{
+		pthread_mutex_lock(&ph->ph[i].fork[ph->ph->irule]);
 		if (ph->ph[i].rule == 1)
-			return (1);
+			return (pthread_mutex_unlock(&ph->ph[i].fork[ph->ph->irule]), 1);
+		pthread_mutex_unlock(&ph->ph[i].fork[ph->ph->irule]);
 		pthread_mutex_lock(&ph->ph[i].fork[ph->ph->speak]);
 		printf("%ld [%d] \033[91mdied\033[0m\n", \
 			time - ph->ph[i].stimer, ph->ph[i].id);
@@ -76,7 +78,9 @@ void	setruleone(t_ph *ph)
 	i = 0;
 	while (i < ph->ph->infph.nbr_philo)
 	{
+		pthread_mutex_lock(&ph->ph[i].fork[ph->ph->irule]);
 		ph->ph[i].rule = 1;
+		pthread_mutex_unlock(&ph->ph[i].fork[ph->ph->irule]);
 		i++;
 	}
 }
@@ -104,6 +108,7 @@ void	philo(char **av)
 	while (is_over(&ph) == 0)
 		;
 	destroy_philo(&ph, threads);
+	//ft_usleep(ph.ph->infph.tdie + ph.ph->infph.teat + ph.ph->infph.tsleep);
 	printf("FINITO\n");
 }
 

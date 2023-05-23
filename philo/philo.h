@@ -6,7 +6,7 @@
 /*   By: hdiot <hdiot@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/02 18:15:41 by hdiot             #+#    #+#             */
-/*   Updated: 2023/05/22 16:56:17 by hdiot            ###   ########.fr       */
+/*   Updated: 2023/05/23 10:55:01 by hdiot            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,6 +39,7 @@ typedef struct s_philo
 	long int		stimer;
 	int				dead;
 	int				irule;
+	int				isdead;
 	int				rule;
 	pthread_mutex_t	*fork;
 	int				meat;
@@ -75,8 +76,8 @@ void		init_mutex(t_ph *ph);
 void		destroy_philo(t_ph *ph, pthread_t *threads);
 long int	timestampdiff(long int start);
 int			is_dead(t_ph *ph, int i);
-void		threadunlock(t_philo *ph);
 void		setruleone(t_ph *ph);
 int			checkrule(t_philo *ph);
+void		speaking(t_philo *ph, char *str);
 
 #endif

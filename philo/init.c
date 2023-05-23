@@ -6,7 +6,7 @@
 /*   By: hdiot <hdiot@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/19 13:24:52 by hdiot             #+#    #+#             */
-/*   Updated: 2023/05/22 16:50:13 by hdiot            ###   ########.fr       */
+/*   Updated: 2023/05/23 19:23:06 by hdiot            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,10 +27,8 @@ void	getinfo(t_ph *ph, char **av)
 		ph->ph[b].id = b + 1;
 		ph->ph[b].timer = 0;
 		ph->ph[b].maxeat = 0;
-		ph->ph[b].dead = 0;
+		ph->ph[b].isdead = 0;
 		ph->ph[b].rule = 0;
-		ph->ph[b].stimer = timestamp();
-		ph->ph[b].lasteat = ph->ph[b].stimer;
 		ph->ph[b].infph.tdie = ft_atoi(av[2]);
 		ph->ph[b].infph.teat = ft_atoi(av[3]);
 		ph->ph[b].infph.tsleep = ft_atoi(av[4]);
@@ -42,51 +40,39 @@ void	getinfo(t_ph *ph, char **av)
 	checkvalue(ph);
 }
 
-void 	threadunlock(t_philo *ph)
-{
-	pthread_mutex_unlock(&ph->fork[ph->meat]);
-	pthread_mutex_unlock(&ph->fork[ph->l_fork]);
-	pthread_mutex_unlock(&ph->fork[ph->r_fork]);
-	pthread_mutex_unlock(&ph->fork[ph->speak]);
-	pthread_mutex_unlock(&ph->fork[ph->dead]);
-}
-
-int	checkrule(t_philo *ph)
+/*int	checkrule(t_philo *ph)
 {
 	pthread_mutex_lock(&ph->fork[ph->irule]);
 	if (ph->rule == 1)
 		return (pthread_mutex_unlock(&ph->fork[ph->irule]), 1);
 	pthread_mutex_unlock(&ph->fork[ph->irule]);
 	return (0);
-}
+}*/
 
 void	*get_time(void *info)
 {
 	t_philo	*ph;
-
+	int		stop;
+	
 	ph = (t_philo *)info;
 	ph->curloop = 0;
+	stop = 0;
 	if (ph->id % 2 == 0)
 		ft_usleep(ph->infph.teat / 2);
 	ph->timer = timestampdiff(ph->stimer);
-	while (ph->curloop != ph->infph.loop)
+	while (!stop)
 	{
-		ph->curloop++;
-		if (checkrule(ph) == 1)
-			return (info);
+		pthread_mutex_lock(&ph->fork[ph->meat]);
+		stop = ph->isdead;
+		pthread_mutex_unlock(&ph->fork[ph->meat]);
 		if (eating(ph) == 1)
-			return (threadunlock(ph), info);
-		if (ph->curloop == ph->infph.loop)
-		{
-			pthread_mutex_lock(&ph->fork[ph->meat]);
-			ph->maxeat = 1;
-			pthread_mutex_unlock(&ph->fork[ph->meat]);
 			break ;
-		}
-		if (sleepthink(ph) == 1)
-			return (threadunlock(ph), info);
+		if (ph->maxeat == ph->infph.loop)
+			break ;	
+		sleepthink(ph);
 	}
-	return (threadunlock(ph), info);
+	printf("[%d] THREAD FINISHED\n", ph->id);
+	return (NULL);
 }
 
 void	init_mutex(t_ph *ph)
@@ -99,7 +85,7 @@ void	init_mutex(t_ph *ph)
 	ph->ph->fork = malloc(sizeof(pthread_mutex_t) * (b + 4));
 	if (!ph->ph->fork)
 		printf("Failed to malloc fork mutex\n");
-	while (i < b + 4)
+	while (i < b + 2)
 	{
 		if (pthread_mutex_init(&ph->ph->fork[i], NULL) != 0)
 			printf("Failed to init fork mutex\n");
@@ -113,8 +99,8 @@ void	init_mutex(t_ph *ph)
 		ph->ph[i].fork = ph->ph->fork;
 		ph->ph[i].speak = b;
 		ph->ph[i].meat = b + 1;
-		ph->ph[i].dead = b + 2;
-		ph->ph[i].irule = b + 3;
+		ph->ph[i].stimer = timestamp();
+		ph->ph[i].lasteat = ph->ph[i].stimer;
 		i++;
 	}
 }
@@ -126,14 +112,13 @@ void	destroy_philo(t_ph *ph, pthread_t *threads)
 
 	i = 0;
 	b = ph->ph->infph.nbr_philo;
-	while (i < b + 4)
+	while (i < b)
+		pthread_join(threads[i++], NULL);
+	i = 0;
+	while (i < (b + 2))
 	{
 		if (pthread_mutex_destroy(&ph->ph->fork[i]) != 0)
-		{	
-			pthread_mutex_unlock(&ph->ph->fork[i]);
-			if (pthread_mutex_destroy(&ph->ph->fork[i]) != 0)
-				printf("Failed to destroy fork [%d] mutex\n", i);
-		}
+			printf("Failed to destroy fork [%d] mutex\n", i);
 		i++;
 	}
 	free(threads);

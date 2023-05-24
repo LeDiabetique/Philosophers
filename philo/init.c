@@ -6,18 +6,27 @@
 /*   By: hdiot <hdiot@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/19 13:24:52 by hdiot             #+#    #+#             */
-/*   Updated: 2023/05/23 19:23:06 by hdiot            ###   ########.fr       */
+/*   Updated: 2023/05/24 09:58:20 by hdiot            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-void	getinfo(t_ph *ph, char **av)
+void	initinfo(t_ph *ph, int b)
+{
+	ph->ph[b].timer = 0;
+	ph->ph[b].maxeat = 0;
+	ph->ph[b].isdead = 0;
+	ph->ph[b].rule = 0;
+}
+
+int	getinfo(t_ph *ph, char **av)
 {
 	int	i;
 	int	b;
 
-	checkdigits(av);
+	if (checkdigits(av) == 1)
+		return (1);
 	i = ft_atoi(av[1]);
 	ph->ph = malloc(sizeof(t_philo) * i);
 	b = 0;
@@ -25,10 +34,7 @@ void	getinfo(t_ph *ph, char **av)
 	{
 		ph->ph[b].infph.nbr_philo = i;
 		ph->ph[b].id = b + 1;
-		ph->ph[b].timer = 0;
-		ph->ph[b].maxeat = 0;
-		ph->ph[b].isdead = 0;
-		ph->ph[b].rule = 0;
+		initinfo(ph, b);
 		ph->ph[b].infph.tdie = ft_atoi(av[2]);
 		ph->ph[b].infph.teat = ft_atoi(av[3]);
 		ph->ph[b].infph.tsleep = ft_atoi(av[4]);
@@ -37,23 +43,16 @@ void	getinfo(t_ph *ph, char **av)
 		else
 			ph->ph[b++].infph.loop = 2147483647;
 	}
-	checkvalue(ph);
-}
-
-/*int	checkrule(t_philo *ph)
-{
-	pthread_mutex_lock(&ph->fork[ph->irule]);
-	if (ph->rule == 1)
-		return (pthread_mutex_unlock(&ph->fork[ph->irule]), 1);
-	pthread_mutex_unlock(&ph->fork[ph->irule]);
+	if (checkvalue(ph) == 1)
+		return (1);
 	return (0);
-}*/
+}
 
 void	*get_time(void *info)
 {
 	t_philo	*ph;
 	int		stop;
-	
+
 	ph = (t_philo *)info;
 	ph->curloop = 0;
 	stop = 0;
@@ -68,10 +67,9 @@ void	*get_time(void *info)
 		if (eating(ph) == 1)
 			break ;
 		if (ph->maxeat == ph->infph.loop)
-			break ;	
+			break ;
 		sleepthink(ph);
 	}
-	printf("[%d] THREAD FINISHED\n", ph->id);
 	return (NULL);
 }
 
@@ -91,8 +89,8 @@ void	init_mutex(t_ph *ph)
 			printf("Failed to init fork mutex\n");
 		i++;
 	}
-	i = 0;
-	while (i < b)
+	i = -1;
+	while (++i < b)
 	{
 		ph->ph[i].l_fork = i;
 		ph->ph[i].r_fork = (i + 1) % b;
@@ -101,7 +99,6 @@ void	init_mutex(t_ph *ph)
 		ph->ph[i].meat = b + 1;
 		ph->ph[i].stimer = timestamp();
 		ph->ph[i].lasteat = ph->ph[i].stimer;
-		i++;
 	}
 }
 

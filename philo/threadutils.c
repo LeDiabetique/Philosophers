@@ -6,21 +6,11 @@
 /*   By: hdiot <hdiot@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/10 10:24:24 by hdiot             #+#    #+#             */
-/*   Updated: 2023/05/23 19:03:55 by hdiot            ###   ########.fr       */
+/*   Updated: 2023/05/24 10:38:16 by hdiot            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
-
-long int	timestamp(void)
-{
-	struct timeval	time;
-	long int		acttime;
-
-	gettimeofday(&time, NULL);
-	acttime = (time.tv_sec * 1000) + (time.tv_usec / 1000);
-	return (acttime);
-}
 
 long int	ft_usleep(int tlimit)
 {
@@ -59,22 +49,21 @@ void	speaking(t_philo *ph, char *str)
 	if (!(ph->isdead))
 		printf("%ld [%d] %s\n", ph->timer, ph->id, str);
 	pthread_mutex_unlock(&(ph->fork[ph->speak]));
-
 }
 
 int	eating(t_philo *ph)
 {
 	pthread_mutex_lock(&ph->fork[ph->l_fork]);
-	speaking(ph, "has taken a lfork");
+	speaking(ph, "\033[92mhas taken a fork\033[0m");
 	if (ph->infph.nbr_philo == 1)
 	{
 		ft_usleep(ph->infph.tdie);
 		return (pthread_mutex_unlock(&ph->fork[ph->l_fork]), 1);
 	}	
 	pthread_mutex_lock(&ph->fork[ph->r_fork]);
-	speaking(ph, "has taken a rfork");
+	speaking(ph, "\033[92mhas taken a fork\033[0m");
 	pthread_mutex_lock(&ph->fork[ph->meat]);
-	speaking(ph, "is eating");
+	speaking(ph, "\033[93mis eating\033[0m");
 	ph->lasteat = timestamp();
 	pthread_mutex_unlock(&ph->fork[ph->meat]);
 	ft_usleep(ph->infph.teat);
@@ -88,8 +77,8 @@ int	eating(t_philo *ph)
 
 int	sleepthink(t_philo *ph)
 {
-	speaking(ph, "is sleeping");
+	speaking(ph, "\033[95mis sleeping\033[0m");
 	ft_usleep(ph->infph.tsleep);
-	speaking(ph, "is thinking");
+	speaking(ph, "\033[94mis thinking\033[0m");
 	return (0);
 }

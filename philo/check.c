@@ -6,7 +6,7 @@
 /*   By: hdiot <hdiot@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/03 10:02:14 by hdiot             #+#    #+#             */
-/*   Updated: 2023/05/22 10:09:23 by hdiot            ###   ########.fr       */
+/*   Updated: 2023/05/24 10:04:03 by hdiot            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,56 +15,66 @@
 void	badargsexit(void)
 {
 	ft_putstr_fd("Bad args, only positives digits near 1 - MAXINT allowed\n", 2);
-	exit(EXIT_FAILURE);
+	return ;
 }
 
-void	checkmaxint(char *str)
+long int	timestamp(void)
 {
-	if (ft_strlen(str) > 10)
-		badargsexit();
+	struct timeval	time;
+	long int		acttime;
+
+	gettimeofday(&time, NULL);
+	acttime = (time.tv_sec * 1000) + (time.tv_usec / 1000);
+	return (acttime);
+}
+
+int	checkmaxint(char *str)
+{
 	if (ft_strlen(str) == 9)
 	{
 		if (str[0] > '2')
-			badargsexit();
+			return (badargsexit(), 1);
 		if (str[1] > '1')
-			badargsexit();
+			return (badargsexit(), 1);
 		if (str[2] > '4')
-			badargsexit();
+			return (badargsexit(), 1);
 		if (str[3] > '7')
-			badargsexit();
+			return (badargsexit(), 1);
 		if (str[4] > '4')
-			badargsexit();
+			return (badargsexit(), 1);
 		if (str[5] > '8')
-			badargsexit();
+			return (badargsexit(), 1);
 		if (str[6] > '3')
-			badargsexit();
+			return (badargsexit(), 1);
 		if (str[7] > '6')
-			badargsexit();
+			return (badargsexit(), 1);
 		if (str[8] > '4')
-			badargsexit();
+			return (badargsexit(), 1);
 		if (str[9] > '7')
-			badargsexit();
+			return (badargsexit(), 1);
 	}
+	return (0);
 }
 
-void	checkvalue(t_ph *ph)
+int	checkvalue(t_ph *ph)
 {
 	if (ph->ph->infph.nbr_philo <= 0 || ph->ph->infph.tdie <= 0
 		|| ph->ph->infph.teat <= 0 || ph->ph->infph.tsleep <= 0)
 	{
 		printf("Bad args, only positives digits \
 			near 1 and MAXINT are allowed\n");
-		exit(EXIT_FAILURE);
+		return (1);
 	}
 	if (ph->ph->infph.loop < -1 || ph->ph->infph.loop == 0)
 	{
 		printf("Bad args, only positives digits \
 			near 1 and MAXINT are allowed\n");
-		exit(EXIT_FAILURE);
+		return (1);
 	}
+	return (0);
 }
 
-void	checkdigits(char **av)
+int	checkdigits(char **av)
 {
 	int	i;
 	int	j;
@@ -73,16 +83,20 @@ void	checkdigits(char **av)
 	while (av[i])
 	{
 		j = 0;
+		if (ft_strlen(av[i]) > 10)
+			return (badargsexit(), 1);
 		while (av[i][j])
 		{
 			if (ft_isdigit((int)av[i][j]) == 0)
 			{
 				printf("Bad args, only digits are allowed\n");
-				exit(EXIT_FAILURE);
+				return (1);
 			}
 			j++;
 		}
-		checkmaxint(av[i]);
+		if (checkmaxint(av[i]) == 1)
+			return (1);
 		i++;
 	}
+	return (0);
 }

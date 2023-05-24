@@ -6,7 +6,7 @@
 /*   By: hdiot <hdiot@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/02 18:15:41 by hdiot             #+#    #+#             */
-/*   Updated: 2023/05/23 10:55:01 by hdiot            ###   ########.fr       */
+/*   Updated: 2023/05/24 09:44:42 by hdiot            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,11 +56,11 @@ typedef struct s_ph
 	t_info	info;
 }	t_ph;
 
-void		checkmaxint(char *str);
-void		checkvalue(t_ph *ph);
-void		checkdigits(char **av);
+int			checkmaxint(char *str);
+int			checkvalue(t_ph *ph);
+int			checkdigits(char **av);
 int			nbrargs(void);
-void		getinfo(t_ph *ph, char **av);
+int			getinfo(t_ph *ph, char **av);
 
 void		ft_putstr_fd(char *str, int fd);
 int			ft_atoi(const char	*str);

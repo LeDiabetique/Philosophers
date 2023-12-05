@@ -16,7 +16,11 @@ Le projet "Philosophers" de l'école 42 est conçu pour introduire les étudiant
 ### Prérequis
 
 - Un compilateur C, comme `gcc`.
+- La commande `make` pour utiliser le Makefile fourni avec le projet.
 - Un système d'exploitation Unix ou similaire.
+```bash
+git clone git@github.com:LeDiabetique/Philosophers.git
+```
 
 ### Compilation
 

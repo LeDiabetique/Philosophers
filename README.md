@@ -17,7 +17,6 @@ Le projet "Philosophers" de l'école 42 est conçu pour introduire les étudiant
 
 - Un compilateur C, comme `gcc`.
 - La commande `make` pour utiliser le Makefile fourni avec le projet.
-- Un système d'exploitation Unix ou similaire.
 ```bash
 git clone git@github.com:LeDiabetique/Philosophers.git
 ```
@@ -41,3 +40,5 @@ Pour exécuter le programme, utilisez la commande suivante :
 - `time_to_eat`: Le temps en millisecondes qu'un philosophe prend pour manger.
 - `time_to_sleep`: Le temps en millisecondes qu'un philosophe passe à dormir.
 - `number_of_times_each_philosopher_must_eat` (optionnel): Le nombre de fois où chaque philosophe doit manger avant de terminer la simulation.
+
+- Exemple : ```./philo 8 500 100 100 12 ```

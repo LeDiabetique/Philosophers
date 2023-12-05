@@ -12,113 +12,113 @@
 
 #include "philo.h"
 
-void	initinfo(t_ph *ph, int b)
+static void	init_philo(t_ph *philo, int b)
 {
-	ph->ph[b].timer = 0;
-	ph->ph[b].maxeat = 0;
-	ph->ph[b].isdead = 0;
-	ph->ph[b].rule = 0;
+	philo->philo[b].timer = 0;
+	philo->philo[b].max_eat = 0;
+	philo->philo[b].is_dead = 0;
+	philo->philo[b].rule = 0;
 }
 
-int	getinfo(t_ph *ph, char **av)
+int	init_rules(t_ph *philo, char **av)
 {
 	int	i;
 	int	b;
 
-	if (checkdigits(av) == 1)
+	if (check_digits(av) == 1)
 		return (1);
 	i = ft_atoi(av[1]);
-	ph->ph = malloc(sizeof(t_philo) * i);
+	philo->philo = malloc(sizeof(t_philo) * i);
 	b = 0;
 	while (b < i)
 	{
-		ph->ph[b].infph.nbr_philo = i;
-		ph->ph[b].id = b + 1;
-		initinfo(ph, b);
-		ph->ph[b].infph.tdie = ft_atoi(av[2]);
-		ph->ph[b].infph.teat = ft_atoi(av[3]);
-		ph->ph[b].infph.tsleep = ft_atoi(av[4]);
+		philo->philo[b].info_philo.nbr_philo = i;
+		philo->philo[b].id = b + 1;
+		init_philo(philo, b);
+		philo->philo[b].info_philo.time_to_die = ft_atoi(av[2]);
+		philo->philo[b].info_philo.time_to_eat = ft_atoi(av[3]);
+		philo->philo[b].info_philo.time_to_sleep = ft_atoi(av[4]);
 		if (av[5])
-			ph->ph[b++].infph.loop = ft_atoi(av[5]);
+			philo->philo[b++].info_philo.loop = ft_atoi(av[5]);
 		else
-			ph->ph[b++].infph.loop = 2147483647;
+			philo->philo[b++].info_philo.loop = 2147483647;
 	}
-	if (checkvalue(ph) == 1)
+	if (check_value(philo) == 1)
 		return (1);
 	return (0);
 }
 
 void	*get_time(void *info)
 {
-	t_philo	*ph;
+	t_philo	*philo;
 	int		stop;
 
-	ph = (t_philo *)info;
-	ph->curloop = 0;
+	philo = (t_philo *)info;
+	philo->current_loop = 0;
 	stop = 0;
-	if (ph->id % 2 == 0)
-		ft_usleep(ph->infph.teat / 2);
-	ph->timer = timestampdiff(ph->stimer);
+	if (philo->id % 2 == 0)
+		ft_usleep(philo->info_philo.time_to_eat / 2);
+	philo->timer = timestamp_diff(philo->start_timer);
 	while (!stop)
 	{
-		pthread_mutex_lock(&ph->fork[ph->meat]);
-		stop = ph->isdead;
-		pthread_mutex_unlock(&ph->fork[ph->meat]);
-		if (eating(ph) == 1)
+		pthread_mutex_lock(&philo->mutex_array[philo->mutex_eat]);
+		stop = philo->is_dead;
+		pthread_mutex_unlock(&philo->mutex_array[philo->mutex_eat]);
+		if (eating(philo) == 1)
 			break ;
-		if (ph->maxeat == ph->infph.loop)
+		if (philo->max_eat == philo->info_philo.loop)
 			break ;
-		sleepthink(ph);
+		sleep_think(philo);
 	}
 	return (NULL);
 }
 
-void	init_mutex(t_ph *ph)
+void	init_mutex(t_ph *philo)
 {
 	int	i;
 	int	b;
 
 	i = 0;
-	b = ph->ph->infph.nbr_philo;
-	ph->ph->fork = malloc(sizeof(pthread_mutex_t) * (b + 4));
-	if (!ph->ph->fork)
-		printf("Failed to malloc fork mutex\n");
+	b = philo->philo->info_philo.nbr_philo;
+	philo->philo->mutex_array = malloc(sizeof(pthread_mutex_t) * (b + 4));
+	if (!philo->philo->mutex_array)
+		printf("Failed to malloc mutex_array mutex\n");
 	while (i < b + 2)
 	{
-		if (pthread_mutex_init(&ph->ph->fork[i], NULL) != 0)
-			printf("Failed to init fork mutex\n");
+		if (pthread_mutex_init(&philo->philo->mutex_array[i], NULL) != 0)
+			printf("Failed to init mutex_array mutex\n");
 		i++;
 	}
 	i = -1;
 	while (++i < b)
 	{
-		ph->ph[i].l_fork = i;
-		ph->ph[i].r_fork = (i + 1) % b;
-		ph->ph[i].fork = ph->ph->fork;
-		ph->ph[i].speak = b;
-		ph->ph[i].meat = b + 1;
-		ph->ph[i].stimer = timestamp();
-		ph->ph[i].lasteat = ph->ph[i].stimer;
+		philo->philo[i].left_fork = i;
+		philo->philo[i].right_fork = (i + 1) % b;
+		philo->philo[i].mutex_array = philo->philo->mutex_array;
+		philo->philo[i].speak = b;
+		philo->philo[i].mutex_eat = b + 1;
+		philo->philo[i].start_timer = timestamp();
+		philo->philo[i].last_eat = philo->philo[i].start_timer;
 	}
 }
 
-void	destroy_philo(t_ph *ph, pthread_t *threads)
+void	destroy_philo(t_ph *philo, pthread_t *threads)
 {
 	int	i;
 	int	b;
 
 	i = 0;
-	b = ph->ph->infph.nbr_philo;
+	b = philo->philo->info_philo.nbr_philo;
 	while (i < b)
 		pthread_join(threads[i++], NULL);
 	i = 0;
 	while (i < (b + 2))
 	{
-		if (pthread_mutex_destroy(&ph->ph->fork[i]) != 0)
-			printf("Failed to destroy fork [%d] mutex\n", i);
+		if (pthread_mutex_destroy(&philo->philo->mutex_array[i]) != 0)
+			printf("Failed to destroy mutex_array [%d] mutex\n", i);
 		i++;
 	}
 	free(threads);
-	free(ph->ph->fork);
-	free(ph->ph);
+	free(philo->philo->mutex_array);
+	free(philo->philo);
 }

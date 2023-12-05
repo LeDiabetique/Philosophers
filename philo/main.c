@@ -12,89 +12,89 @@
 
 #include "philo.h"
 
-int	is_over(t_ph *ph)
+int	is_over(t_ph *philo)
 {
 	int	i;
 	int	b;
 	int	onedied;
 
 	onedied = 0;
-	while (!(ph->ph->rule))
+	while (!(philo->philo->rule))
 	{
 		i = -1;
-		while (++i < ph->ph->infph.nbr_philo && !ph->ph[i].isdead)
+		while (++i < philo->philo->info_philo.nbr_philo && !philo->philo[i].is_dead)
 		{
-			if (!onedied && is_dead(ph, i) == 1)
+			if (!onedied && is_dead(philo, i) == 1)
 				return (onedied = 1, 1);
 		}
-		pthread_mutex_lock(&ph->ph[0].fork[ph->ph[0].meat]);
+		pthread_mutex_lock(&philo->philo[0].mutex_array[philo->philo[0].mutex_eat]);
 		b = 0;
-		while (b < ph->ph[0].infph.nbr_philo \
-			&& ph->ph[0].maxeat >= ph->ph[0].infph.loop)
+		while (b < philo->philo[0].info_philo.nbr_philo \
+			&& philo->philo[0].max_eat >= philo->philo[0].info_philo.loop)
 			b++;
-		pthread_mutex_unlock(&ph->ph[0].fork[ph->ph[0].meat]);
-		if (b == ph->ph[0].infph.nbr_philo)
-			ph->ph->rule = 1;
+		pthread_mutex_unlock(&philo->philo[0].mutex_array[philo->philo[0].mutex_eat]);
+		if (b == philo->philo[0].info_philo.nbr_philo)
+			philo->philo->rule = 1;
 	}
 	return (1);
 }
 
-int	is_dead(t_ph *ph, int i)
+int	is_dead(t_ph *philo, int i)
 {
 	long int	time;
-	int			tdie;
+	int			time_to_die;
 
-	tdie = ph->ph[i].infph.tdie;
+	time_to_die = philo->philo[i].info_philo.time_to_die;
 	time = timestamp();
-	pthread_mutex_lock(&ph->ph[i].fork[ph->ph[i].meat]);
-	if (time - ph->ph[i].lasteat >= tdie && ph->ph[i].rule != 1)
+	pthread_mutex_lock(&philo->philo[i].mutex_array[philo->philo[i].mutex_eat]);
+	if (time - philo->philo[i].last_eat >= time_to_die && philo->philo[i].rule != 1)
 	{
-		pthread_mutex_lock(&ph->ph[i].fork[ph->ph->speak]);
+		pthread_mutex_lock(&philo->philo[i].mutex_array[philo->philo->speak]);
 		printf("%ld [%d] \033[91mdied\033[0m\n", \
-			time - ph->ph[i].stimer, ph->ph[i].id);
-		setruleone(ph);
-		pthread_mutex_unlock(&ph->ph[i].fork[ph->ph->speak]);
-		return (pthread_mutex_unlock(&ph->ph[i].fork[ph->ph[i].meat]), 1);
+			time - philo->philo[i].start_timer, philo->philo[i].id);
+		set_rule_to_one(philo);
+		pthread_mutex_unlock(&philo->philo[i].mutex_array[philo->philo->speak]);
+		return (pthread_mutex_unlock(&philo->philo[i].mutex_array[philo->philo[i].mutex_eat]), 1);
 	}
-	pthread_mutex_unlock(&ph->ph[i].fork[ph->ph->meat]);
+	pthread_mutex_unlock(&philo->philo[i].mutex_array[philo->philo->mutex_eat]);
 	usleep(100);
 	return (0);
 }
 
-void	setruleone(t_ph *ph)
+void	set_rule_to_one(t_ph *philo)
 {
 	int	i;
 
 	i = 0;
-	while (i < ph->ph->infph.nbr_philo)
+	while (i < philo->philo->info_philo.nbr_philo)
 	{
-		ph->ph[i].isdead = 1;
+		philo->philo[i].is_dead = 1;
 		i++;
 	}
 }
 
 int	philo(char **av)
 {
-	t_ph		ph;
+	t_ph		philo;
 	int			i;
 	pthread_t	*threads;
 
 	i = 0;
-	if (getinfo(&ph, av) == 1)
+	if (init_rules(&philo, av) == 1)
 		return (1);
-	threads = malloc(sizeof(pthread_t) * ph.ph->infph.nbr_philo);
+	threads = malloc(sizeof(pthread_t) * philo.philo->info_philo.nbr_philo);
 	if (!threads)
-		return (free(ph.ph), 1);
-	init_mutex(&ph);
-	while (i < ph.ph->infph.nbr_philo)
+		return (free(philo.philo), 1);
+	init_mutex(&philo);
+	while (i < philo.philo->info_philo.nbr_philo)
 	{
-		pthread_create(&threads[i], NULL, get_time, &ph.ph[i]);
+		pthread_create(&threads[i], NULL, get_time, &philo.philo[i]);
 		i++;
 	}
-	is_over(&ph);
-	ft_usleep((ph.ph->infph.tdie + ph.ph->infph.teat \
-		+ ph.ph->infph.tsleep) * 2);
-	destroy_philo(&ph, threads);
+	is_over(&philo);
+	ft_usleep((philo.philo->info_philo.time_to_die + philo.philo->info_philo.time_to_eat \
+		+ philo.philo->info_philo.time_to_sleep) * 2);
+	destroy_philo(&philo, threads);
 	return (0);
 }
 
@@ -102,7 +102,7 @@ int	main(int argc, char **argv)
 {
 	(void) argc;
 	if (argc < 5 || argc > 6)
-		return (nbrargs());
+		return (bad_args_message());
 	if (philo(argv) == 1)
 		return (1);
 	return (0);

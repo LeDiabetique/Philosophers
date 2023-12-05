@@ -12,60 +12,61 @@
 
 #include "philo.h"
 
-void	badargsexit(void)
+void	bad_args_exit(void)
 {
-	ft_putstr_fd("Bad args, only positives digits near 1 - MAXINT allowed\n", 2);
+	ft_putstr_fd("Bad args, only positives \
+		digits near 1 - MAXINT allowed\n", 2);
 	return ;
 }
 
 long int	timestamp(void)
 {
 	struct timeval	time;
-	long int		acttime;
+	long int		current_time;
 
 	gettimeofday(&time, NULL);
-	acttime = (time.tv_sec * 1000) + (time.tv_usec / 1000);
-	return (acttime);
+	current_time = (time.tv_sec * 1000) + (time.tv_usec / 1000);
+	return (current_time);
 }
 
-int	checkmaxint(char *str)
+int	check_max_int(char *str)
 {
 	if (ft_strlen(str) == 9)
 	{
 		if (str[0] > '2')
-			return (badargsexit(), 1);
+			return (bad_args_exit(), 1);
 		if (str[1] > '1')
-			return (badargsexit(), 1);
+			return (bad_args_exit(), 1);
 		if (str[2] > '4')
-			return (badargsexit(), 1);
+			return (bad_args_exit(), 1);
 		if (str[3] > '7')
-			return (badargsexit(), 1);
+			return (bad_args_exit(), 1);
 		if (str[4] > '4')
-			return (badargsexit(), 1);
+			return (bad_args_exit(), 1);
 		if (str[5] > '8')
-			return (badargsexit(), 1);
+			return (bad_args_exit(), 1);
 		if (str[6] > '3')
-			return (badargsexit(), 1);
+			return (bad_args_exit(), 1);
 		if (str[7] > '6')
-			return (badargsexit(), 1);
+			return (bad_args_exit(), 1);
 		if (str[8] > '4')
-			return (badargsexit(), 1);
+			return (bad_args_exit(), 1);
 		if (str[9] > '7')
-			return (badargsexit(), 1);
+			return (bad_args_exit(), 1);
 	}
 	return (0);
 }
 
-int	checkvalue(t_ph *ph)
+int	check_value(t_ph *philo)
 {
-	if (ph->ph->infph.nbr_philo <= 0 || ph->ph->infph.tdie <= 0
-		|| ph->ph->infph.teat <= 0 || ph->ph->infph.tsleep <= 0)
+	if (philo->philo->info_philo.nbr_philo <= 0 || philo->philo->info_philo.time_to_die <= 0
+		|| philo->philo->info_philo.time_to_eat <= 0 || philo->philo->info_philo.time_to_sleep <= 0)
 	{
 		printf("Bad args, only positives digits \
 			near 1 and MAXINT are allowed\n");
 		return (1);
 	}
-	if (ph->ph->infph.loop < -1 || ph->ph->infph.loop == 0)
+	if (philo->philo->info_philo.loop < -1 || philo->philo->info_philo.loop == 0)
 	{
 		printf("Bad args, only positives digits \
 			near 1 and MAXINT are allowed\n");
@@ -74,7 +75,7 @@ int	checkvalue(t_ph *ph)
 	return (0);
 }
 
-int	checkdigits(char **av)
+int	check_digits(char **av)
 {
 	int	i;
 	int	j;
@@ -84,7 +85,7 @@ int	checkdigits(char **av)
 	{
 		j = 0;
 		if (ft_strlen(av[i]) > 10)
-			return (badargsexit(), 1);
+			return (bad_args_exit(), 1);
 		while (av[i][j])
 		{
 			if (ft_isdigit((int)av[i][j]) == 0)
@@ -94,7 +95,7 @@ int	checkdigits(char **av)
 			}
 			j++;
 		}
-		if (checkmaxint(av[i]) == 1)
+		if (check_max_int(av[i]) == 1)
 			return (1);
 		i++;
 	}

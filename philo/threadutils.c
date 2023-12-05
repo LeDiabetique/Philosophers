@@ -12,73 +12,73 @@
 
 #include "philo.h"
 
-long int	ft_usleep(int tlimit)
+long int	ft_usleep(int limit)
 {
 	long int	time;
 	long int	end;
-	long int	res;
+	long int	result;
 
 	time = 0;
 	time = timestamp();
-	res = time;
-	end = time + tlimit;
-	usleep(tlimit * 1000 * 70 / 100);
+	result = time;
+	end = time + limit;
+	usleep(limit * 1000 * 70 / 100);
 	while (end - time > 0)
 	{	
 		usleep(100);
 		time = timestamp();
 	}
-	return (time - res);
+	return (time - result);
 }
 
-long int	timestampdiff(long int start)
+long int	timestamp_diff(long int start)
 {
-	long int	newtime;
-	long int	acttime;
+	long int	new_time;
+	long int	actual_time;
 
-	acttime = 0;
-	acttime = timestamp();
-	newtime = acttime - start;
-	return (newtime);
+	actual_time = 0;
+	actual_time = timestamp();
+	new_time = actual_time - start;
+	return (new_time);
 }
 
-void	speaking(t_philo *ph, char *str)
+void	speaking(t_philo *philo, char *str)
 {
-	pthread_mutex_lock(&(ph->fork[ph->speak]));
-	ph->timer = timestampdiff(ph->stimer);
-	if (!(ph->isdead))
-		printf("%ld [%d] %s\n", ph->timer, ph->id, str);
-	pthread_mutex_unlock(&(ph->fork[ph->speak]));
+	pthread_mutex_lock(&(philo->mutex_array[philo->speak]));
+	philo->timer = timestamp_diff(philo->start_timer);
+	if (!(philo->is_dead))
+		printf("%ld [%d] %s\n", philo->timer, philo->id, str);
+	pthread_mutex_unlock(&(philo->mutex_array[philo->speak]));
 }
 
-int	eating(t_philo *ph)
+int	eating(t_philo *philo)
 {
-	pthread_mutex_lock(&ph->fork[ph->l_fork]);
-	speaking(ph, "\033[92mhas taken a fork\033[0m");
-	if (ph->infph.nbr_philo == 1)
+	pthread_mutex_lock(&philo->mutex_array[philo->left_fork]);
+	speaking(philo, "\033[92mhas taken his left fork\033[0m");
+	if (philo->info_philo.nbr_philo == 1)
 	{
-		ft_usleep(ph->infph.tdie);
-		return (pthread_mutex_unlock(&ph->fork[ph->l_fork]), 1);
+		ft_usleep(philo->info_philo.time_to_die);
+		return (pthread_mutex_unlock(&philo->mutex_array[philo->left_fork]), 1);
 	}	
-	pthread_mutex_lock(&ph->fork[ph->r_fork]);
-	speaking(ph, "\033[92mhas taken a fork\033[0m");
-	pthread_mutex_lock(&ph->fork[ph->meat]);
-	speaking(ph, "\033[93mis eating\033[0m");
-	ph->lasteat = timestamp();
-	pthread_mutex_unlock(&ph->fork[ph->meat]);
-	ft_usleep(ph->infph.teat);
-	pthread_mutex_lock(&ph->fork[ph->meat]);
-	ph->maxeat++;
-	pthread_mutex_unlock(&ph->fork[ph->meat]);
-	pthread_mutex_unlock(&ph->fork[ph->l_fork]);
-	pthread_mutex_unlock(&ph->fork[ph->r_fork]);
+	pthread_mutex_lock(&philo->mutex_array[philo->right_fork]);
+	speaking(philo, "\033[92mhas taken his right fork\033[0m");
+	pthread_mutex_lock(&philo->mutex_array[philo->mutex_eat]);
+	speaking(philo, "\033[93mis eating\033[0m");
+	philo->last_eat = timestamp();
+	pthread_mutex_unlock(&philo->mutex_array[philo->mutex_eat]);
+	ft_usleep(philo->info_philo.time_to_eat);
+	pthread_mutex_lock(&philo->mutex_array[philo->mutex_eat]);
+	philo->max_eat++;
+	pthread_mutex_unlock(&philo->mutex_array[philo->mutex_eat]);
+	pthread_mutex_unlock(&philo->mutex_array[philo->left_fork]);
+	pthread_mutex_unlock(&philo->mutex_array[philo->right_fork]);
 	return (0);
 }
 
-int	sleepthink(t_philo *ph)
+int	sleep_think(t_philo *philo)
 {
-	speaking(ph, "\033[95mis sleeping\033[0m");
-	ft_usleep(ph->infph.tsleep);
-	speaking(ph, "\033[94mis thinking\033[0m");
+	speaking(philo, "\033[95mis sleeping\033[0m");
+	ft_usleep(philo->info_philo.time_to_sleep);
+	speaking(philo, "\033[94mis thinking\033[0m");
 	return (0);
 }

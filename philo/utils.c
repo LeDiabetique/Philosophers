@@ -43,36 +43,36 @@ size_t	ft_strlen(const char *c)
 	return (i);
 }
 
-int	ft_atoi(const char	*str)
+int	ft_atoi(const char	*param_str)
 {
-	char	*s;
+	char	*string;
 	int		sign;
-	int		res;
+	int		result;
 
-	s = (char *)str;
+	string = (char *)param_str;
 	sign = 1;
-	res = 0;
-	while (*s == 32 || *s == '\f' || *s == '\n'
-		|| *s == '\r' || *s == '\t' || *s == '\v')
-			s++;
-	if (*s == '-')
+	result = 0;
+	while (*string == 32 || *string == '\f' || *string == '\n'
+		|| *string == '\r' || *string == '\t' || *string == '\v')
+		string++;
+	if (*string == '-')
 	{
 		sign = sign * -1;
-		s++;
+		string++;
 	}
-	else if (*s == '+')
-		s++;
-	while (*s >= '0' && *s <= '9')
+	else if (*string == '+')
+		string++;
+	while (*string >= '0' && *string <= '9')
 	{
-		res = res * 10 + *s - '0';
-		if (!(*s >= '0' && *s <= '9'))
-			return (res * sign);
-		s++;
+		result = result * 10 + *string - '0';
+		if (!(*string >= '0' && *string <= '9'))
+			return (result * sign);
+		string++;
 	}
-	return (res * sign);
+	return (result * sign);
 }
 
-int	nbrargs(void)
+int	bad_args_message(void)
 {
 	printf("Must have those arguments :\n");
 	printf("number_of_philosophers time_to_die time_to_eat time_to_sleep\n");
